@@ -1,40 +1,24 @@
-use std::io;
-pub struct User{
-    username: String,
-    email: String,
-    phone: String,
-    activation_status:bool
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(get_hello_service)
+            .route("/hello", web::get().to(get_hello))
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
 
-pub fn user_factory(
-    username: String ,
-    email : String ,
-    phone : String,
-    activation_status: bool) -> User{
 
-       let temp_user= User{
-            username,
-            email,
-            phone,
-            activation_status: activation_status
-        };
+async fn get_hello() -> impl Responder {
+    HttpResponse::Ok().body(String::from("Hello, world!"))
+}
 
-        return temp_user;
-    }
-
-pub fn main() {
-
-    let mut username = String::new();
-
-    io::stdin()
-    .read_line(&mut username)
-    .ok()
-    .expect("error reading username");
-
-    
-
-    
-
-
-
+#[get("/hello_service")]
+async fn get_hello_service() -> impl Responder {
+    HttpResponse::Ok().body(String::from("Hello, world! From service"))
 }
