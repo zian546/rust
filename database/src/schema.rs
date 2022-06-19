@@ -3,5 +3,6 @@ table! {
         id -> Integer,
         username -> Varchar,
         password -> Varchar,
+        value -> Integer,
     }
 }
