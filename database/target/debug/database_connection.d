@@ -1,1 +1,0 @@
-C:\Users\ASUS\Documents\GitHub\tugas-axel\rust\database\target\debug\database_connection.exe: C:\Users\ASUS\Documents\GitHub\tugas-axel\rust\database\src\bin\database_connection.rs C:\Users\ASUS\Documents\GitHub\tugas-axel\rust\database\src\bin\models.rs C:\Users\ASUS\Documents\GitHub\tugas-axel\rust\database\src\bin\schema.rs
