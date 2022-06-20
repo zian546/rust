@@ -75,14 +75,14 @@ pub fn find_by_id(_id: i32, connection_to_database: &MysqlConnection) -> Vec<Use
     //!     id
     //!   ))
     //! ```
-    //! 
+    //!
     //! the load method retirieve the query result and store it inside the ```<User>``` Vector to be returned
     //! when the function is called.
-    //! 
+    //!
     //! ```
     //! .load::<User>(connection_to_database)
     //! ```
-    //! 
+    //!
     //! while the ```.unwrap()``` method is used to literally _unwrap_ the ```result``` from ```Result<Vec<User>,Error>``` to just ```Vec<User>``` by consuming the ```Error``` result
     //! leaving just the vector to be returned.
 
@@ -185,8 +185,71 @@ pub fn register_new_user(
     }
 }
 
-//update user that existed in database
+///update user that existed in database using id as a parameter.
+/// 
 pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
+    //!this function will update the user based on the id of the user given when we call this function.
+    //! this function works using the diesel ORM auto-generated SQL statement
+    //!
+    //! #Code:
+    //! ```
+    //!let result = update(user)
+    //!     .filter(id.eq(_id))
+    //!     .set(value.eq(_value))
+    //!     .execute(con)
+    //!     .unwrap_or_else(|err| return 0);
+    //! 
+    //!if result == 0 {
+    //!     return false;
+    //!} else {
+    //!     return true;
+    //!}
+    //! ```
+    //! 
+    //! the update keyword here is actually a neat way to create a ```UPDATE``` query statement 
+    //! that has been provided by the diesel crate.
+    //! ```
+    //! let result = update(user)
+    //! ```
+    //! while the ```.filter``` is actually a ```WHERE``` clause on the query statement, and we pass in
+    //! the ```id``` to specify what field we want to filter.
+    //! ```
+    //! .filter(id.eq(_id))
+    //! ```
+    //! the ```.set``` keyword is a way to create ```SET``` keyword in SQL query statement.
+    //! then pass in the field name  that we want to update as seen below by ```value```.
+    //! The ```.eq()``` method is used to tell what value we want to change into. *_BUT_* the ```set``` keyword
+    //! doesn't _actually execute_ the statement. The statement will be executed when we call the ```.execute()``` method as seen later below.
+    //! ```
+    //! .set(value.eq(_value))
+    //! ```
+    //! Now this is where the statement will be executed. it will be immediately executed when we call the ```execute()``` method.
+    //! we pass in an ```MysqlConnection``` instance which is the connection that we actually wiill be using to interact with the database, in this case updating a field in the database.
+    //! ```
+    //! .execute(con)
+    //! ```
+    //! next the ```.unwrap_or_else()``` works by _literally unwrapping_ the ```Result``` enum  and returning a ```usize``` of ```1``` 
+    //! if the SQL statement was successfully executed, and we add the ```|err| return 0;``` closure to return ```0``` when the SQL statement
+    //! fails to execute.
+    //! ```
+    //! .unwrap_or_else(|err| return 0);
+    //! ```
+    //! and then we have a simple ```if else``` block of code that will evaluate the return value of the the SQL statement execution.
+    //! this return a ```boolean``` value depending on the ```usize``` that have been returned by the SQL statement execution.
+    //! ```
+    //! if result == 0{
+    //!     return false;
+    //! } else {
+    //!     return true;
+    //!     }
+    //! ```
+    //! why a ```boolean``` value? if you take a closer look at the return type of the ```update_user_by_id``` function, you will notice
+    //! that the function have a return type of ```bool```.
+    //! ```
+    //! pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool //<- we return a boolean value here
+    //! ```
+
+
     let result = update(user)
         .filter(id.eq(_id))
         .set(value.eq(_value))
@@ -200,7 +263,30 @@ pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
     }
 }
 
+
+///update user that existed in database using username as a parameter.
+/// 
 pub fn update_user_by_username(_username: String, _value: i32, con: &MysqlConnection) -> bool {
+    //!this function will update the user based on the ```_username``` that is the actual username of the user pass in when we call this function.
+    //! this function works using the diesel ORM auto-generated SQL statement
+    //!
+    //! #Code:
+    //! ```
+    //!let result = update(user)
+    //!     .filter(username.eq(_username))
+    //!     .set(value.eq(_value))
+    //!     .execute(con)
+    //!     .unwrap_or_else(|err| return 0);
+    //! 
+    //!if result == 0 {
+    //!     return false;
+    //!} else {
+    //!     return true;
+    //!}
+    //! ```
+    //! this function works very similarly to the ```update_user_by_id``` function. see [here](fn.update_user_by_id.html) for more details
+
+
     let result = update(user)
         .filter(username.eq(_username))
         .set(value.eq(_value))
