@@ -6,7 +6,7 @@ pub mod schema;
 
 use self::models::*;
 use self::schema::user::dsl::*;
-use diesel::{prelude::*, sql_query, update};
+use diesel::{delete, insert_into, prelude::*, sql_query, update};
 use dotenv::dotenv;
 use std::env;
 
@@ -61,47 +61,86 @@ pub fn register_new_user(
     };
 
     //insert user into database
-    diesel::insert_into(user)
+    insert_into(user)
         .values(&temp_user)
         .execute(connection_to_database)
         .unwrap();
 }
 
 //update user that existed in database
-pub fn update_user_by_id(_value: i32, _id: i32, con: &MysqlConnection)-> usize {
+pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
     let result = update(user)
         .filter(id.eq(_id))
         .set(value.eq(_value))
         .execute(con)
         .unwrap();
 
-        return result
+    if result == 0 {
+        return false;
+    } else {
+        return true;
+    }
 }
 
-pub fn update_user_by_username(_username: String, _value: i32, con: &MysqlConnection,){
-    
+pub fn update_user_by_username(_username: String, _value: i32, con: &MysqlConnection) -> bool {
+    let result = update(user)
+        .filter(username.eq(_username))
+        .set(value.eq(_value))
+        .execute(con)
+        .unwrap();
+
+    if result == 0 {
+        return false;
+    } else {
+        return true;
+    }
 }
 
-/*
-pub fn delete_user_by_id(_id: i32,con: &MysqlConnection) -> bool { }
+//delete user in database
+pub fn delete_user_by_id(_id: i32, con: &MysqlConnection) -> bool {
+    let result = delete(user
+        .filter(id.eq(_id)))
+        .execute(con)
+        .unwrap();
 
-pub fn delete_user_by_username(_username: String, con: &MysqlConnection) -> bool { }
+        if result == 0 {
+            return false;
+        } else {
+            return true;
+        }
+}
+
+
+pub fn delete_user_by_username(_username: String, con: &MysqlConnection) -> bool {
+
+    let result = delete(user
+        .filter(username.eq(_username)))
+        .execute(con)
+        .unwrap();
+
+        if result == 0 {
+            return false;
+        } else {
+            return true;
+        }
+ }
 
 
 pub fn hash_password(_password: String) -> String{
-
+    return "test".to_string()
 }
-*/
+
 
 pub fn main() {
     let connection_db = establish_connection();
+    register_new_user("zian".to_string(), "password".to_string(), &connection_db);
     let user_exist = find_all(&connection_db);
 
     println!("{:?}", user_exist);
 
-    
-    let update_user = update_user_by_id(30, 1, &connection_db);
+    let delete_user = delete_user_by_username("zian".to_string(),&connection_db);
     let user_exist = find_all(&connection_db);
 
-    println!("{:?}", update_user);
+    println!("{:?}", delete_user);
+    println!("{:?}", user_exist);
 }
