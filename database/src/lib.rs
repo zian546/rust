@@ -128,16 +128,29 @@ pub fn find_by_username(_username: String, connection_to_database: &MysqlConnect
     return result;
 }
 
-///this function return a vector type```Vec<User>``` and will return all the user that are currently saved in the database.
-pub fn find_all(connection_to_database: &MysqlConnection) -> Vec<User> {
-    let result = sql_query("SELECT * FROM `user` ")
+///this function return a vector type ```Vec<User>``` and will return all the user that are currently saved in the database.
+/// 
+pub fn find_all(table_name: String,connection_to_database: &MysqlConnection) -> Vec<User> {
+    //! this function retrieve all entitiy that are present in the database. this function takes 2 arguments,
+    //! the table name:```table_name:String``` and the connection to the database ```connection_to_database:MysqlConnection```.
+    //! 
+    //! ```#Code:```
+    //! ```
+    //! let result = sql_query(format!("SELECT * FROM `{}`",table_name))
+    //!     .load::<User>(connection_to_database_)
+    //!     .unwrap();
+    //! 
+    //! return result;
+    //! ```
+    let result = sql_query(format!("SELECT * FROM `{}` ",table_name))
         .load::<User>(connection_to_database)
         .unwrap();
 
     return result;
 }
 
-/// this function save  a user in database
+/// this function save  a user in database.
+/// 
 pub fn register_new_user(
     _username: String,
     _password: String,
@@ -300,7 +313,7 @@ pub fn update_user_by_username(_username: String, _value: i32, con: &MysqlConnec
 /// this function delete ```1```  user in database using user id as a parameter.
 ///
 pub fn delete_user_by_id(_id: i32, con: &MysqlConnection) -> bool {
-    //! this function will delete 1 user from the database using user id as a parameter.
+    //! this function will delete 1 user from the database using user id as a parameter and return a boolean value true if the query succeded or false otherwise.
     //! this function is also works by using the auto generated SQL query statement method provided by diesel.
     //!
     //! ```#Code:```
@@ -345,7 +358,28 @@ pub fn delete_user_by_id(_id: i32, con: &MysqlConnection) -> bool {
     }
 }
 
+/// this function will delete a user from the database using the user's username as parameter
+/// 
 pub fn delete_user_by_username(_username: String, con: &MysqlConnection) -> bool {
+
+    //! this function will delete 1 user from the database using user's   as a parameter and return a boolean value true if the query succeded or false otherwise.
+    //! this function is also works by using the auto generated SQL query statement method provided by diesel.
+    //!
+    //! ```#Code:```
+    //! ```
+    //! let result = delete(user.filter(id.eq(_id)))
+    //!     .execute(con)
+    //!     .unwrap_or_else(|err| return 0);
+    //!
+    //! if result == 0 {
+    //!     return false
+    //! } else {
+    //!     return true
+    //! }
+    //! ```
+    //! this function works very similarly to ```delete_user_by_id``` function (see [here](fn.delete_user_by_id.html)). except that in this function, rather than taking the user's id as argument,
+    //! it takes the user's username and attempt to delete the entitiy that have the same username given as the argument.
+    
     let result = delete(user.filter(username.eq(_username)))
         .execute(con)
         .unwrap_or_else(|err| return 0);
