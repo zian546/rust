@@ -1,5 +1,5 @@
 CREATE TABLE `api_case_project`.`USER` (
-    `id` INT NOT NULL,
+    `id` INT NOT NULL AUTO_INCREMENT,
     `username` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `value` INT NOT NULL,

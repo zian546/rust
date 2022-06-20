@@ -1,19 +1,21 @@
-use schema::user;
+use crate::schema::user;
 
 use diesel::Insertable;
-use diesel::Queryable;
+use diesel::QueryableByName;
 
-#[derive(Queryable)]
+#[derive(QueryableByName, PartialEq, Debug)]
+#[table_name = "user"]
 pub struct User {
-    pub id: u32,
+    pub id: i32,
     pub username: String,
     pub password: String,
+    pub value: i32
 }
 
 //model for inserting user to database at registration
 #[derive(Insertable)]
 #[table_name = "user"]
-pub struct NewUser  {
-    pub username: String,
-    pub password: String,
+pub struct NewUser  <'a>   {
+    pub username: &'a str,
+    pub password: &'a str,
 }
