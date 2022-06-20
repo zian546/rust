@@ -19,7 +19,7 @@ pub fn establish_connection() -> MysqlConnection {
     //! this function is the *main* core of this library, it's job is to establish a connection to the database
     //! and allows us to do all sorts of things with the database
     //!
-    //! #Code:
+    //! ```#Code:```
     //! ```
     //! dotenv().ok();
     //!
@@ -57,7 +57,7 @@ pub fn find_by_id(_id: i32, connection_to_database: &MysqlConnection) -> Vec<Use
     //! even if it couldn't find the desired user using id so be sure to pay attention to the return value,
     //! this means that if the function couldn't find the desired user, then it will only return an empty vector.
     //!
-    //! #Code:
+    //! ```#Code:```
     //!
     //! ```
     //! let result = sql_query(format!(
@@ -103,7 +103,7 @@ pub fn find_by_username(_username: String, connection_to_database: &MysqlConnect
     //! this function also returns an empty vector if it didn't find the desired user
     //! you only have to pass in the username(```String NOT &str```).
     //!
-    //! #Code:
+    //! ```#Code:```
     //!
     //! ```
     //! let result = sql_query(format!(
@@ -186,30 +186,30 @@ pub fn register_new_user(
 }
 
 ///update user that existed in database using id as a parameter.
-/// 
+///
 pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
     //!this function will update the user based on the id of the user given when we call this function.
     //! this function works using the diesel ORM auto-generated SQL statement
     //!
-    //! #Code:
+    //! ```#Code:```
     //! ```
     //!let result = update(user)
     //!     .filter(id.eq(_id))
     //!     .set(value.eq(_value))
     //!     .execute(con)
     //!     .unwrap_or_else(|err| return 0);
-    //! 
+    //!
     //!if result == 0 {
     //!     return false;
     //!} else {
     //!     return true;
     //!}
     //! ```
-    //! 
-    //! the update keyword here is actually a neat way to create a ```UPDATE``` query statement 
+    //!
+    //! the update keyword here is actually a neat way to create a ```UPDATE``` query statement
     //! that has been provided by the diesel crate.
     //! ```
-    //! let result = update(user)
+    //! let result = update(table_name)
     //! ```
     //! while the ```.filter``` is actually a ```WHERE``` clause on the query statement, and we pass in
     //! the ```id``` to specify what field we want to filter.
@@ -221,14 +221,14 @@ pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
     //! The ```.eq()``` method is used to tell what value we want to change into. *_BUT_* the ```set``` keyword
     //! doesn't _actually execute_ the statement. The statement will be executed when we call the ```.execute()``` method as seen later below.
     //! ```
-    //! .set(value.eq(_value))
+    //! .set(field_name.eq(field_value))
     //! ```
     //! Now this is where the statement will be executed. it will be immediately executed when we call the ```execute()``` method.
     //! we pass in an ```MysqlConnection``` instance which is the connection that we actually wiill be using to interact with the database, in this case updating a field in the database.
     //! ```
-    //! .execute(con)
+    //! .execute(database_connection)
     //! ```
-    //! next the ```.unwrap_or_else()``` works by _literally unwrapping_ the ```Result``` enum  and returning a ```usize``` of ```1``` 
+    //! next the ```.unwrap_or_else()``` works by _literally unwrapping_ the ```Result``` enum  and returning a ```usize``` of ```1```
     //! if the SQL statement was successfully executed, and we add the ```|err| return 0;``` closure to return ```0``` when the SQL statement
     //! fails to execute.
     //! ```
@@ -249,7 +249,6 @@ pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
     //! pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool //<- we return a boolean value here
     //! ```
 
-
     let result = update(user)
         .filter(id.eq(_id))
         .set(value.eq(_value))
@@ -263,21 +262,20 @@ pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
     }
 }
 
-
 ///update user that existed in database using username as a parameter.
-/// 
+///
 pub fn update_user_by_username(_username: String, _value: i32, con: &MysqlConnection) -> bool {
     //!this function will update the user based on the ```_username``` that is the actual username of the user pass in when we call this function.
-    //! this function works using the diesel ORM auto-generated SQL statement
+    //! this function works because it uses the diesel ORM auto-generated SQL statement
     //!
-    //! #Code:
+    //! ```#Code:```
     //! ```
     //!let result = update(user)
     //!     .filter(username.eq(_username))
     //!     .set(value.eq(_value))
     //!     .execute(con)
     //!     .unwrap_or_else(|err| return 0);
-    //! 
+    //!
     //!if result == 0 {
     //!     return false;
     //!} else {
@@ -285,7 +283,6 @@ pub fn update_user_by_username(_username: String, _value: i32, con: &MysqlConnec
     //!}
     //! ```
     //! this function works very similarly to the ```update_user_by_id``` function. see [here](fn.update_user_by_id.html) for more details
-
 
     let result = update(user)
         .filter(username.eq(_username))
@@ -300,16 +297,51 @@ pub fn update_user_by_username(_username: String, _value: i32, con: &MysqlConnec
     }
 }
 
-//delete user in database
+/// this function delete ```1```  user in database using user id as a parameter.
+///
 pub fn delete_user_by_id(_id: i32, con: &MysqlConnection) -> bool {
+    //! this function will delete 1 user from the database using user id as a parameter.
+    //! this function is also works by using the auto generated SQL query statement method provided by diesel.
+    //!
+    //! ```#Code:```
+    //! ```
+    //! let result = delete(user.filter(id.eq(_id)))
+    //!     .execute(con)
+    //!     .unwrap_or_else(|err| return 0);
+    //!
+    //! if result == 0 {
+    //!     return false
+    //! } else {
+    //!     return true
+    //! }
+    //! ```
+    //! the ```delete``` method is used to generate ```DELETE``` SQL query statement. it takes in 1 argument and that is 
+    //! the table name of the entity that we want to delete. ```CAUTION``` this method will erase all the row/entity in the table name that we pass in as argument.
+    //! MAKES SURE TO FILTER THE ROW THAT YOU WANT TO DELETE BY USING  ```.filter()``` METHOD AS SEEN LIKE BELOW.
+    //! ```
+    //! delete(your_table_name.filter(field_name.eq(field_value))
+    //! ```
+    //! the ```.execute()``` method will then execute the ```DELETE``` statement and return an ```usize``` value, that we are going to evaluate later.
+    //! ```
+    //! .execute(database_connection)
+    //! ```
+    //! and then we have a simple ```if else``` block to evaluate the return value of the ```DELETE```  SQL statement execution.
+    //! ```
+    //! if result == 0 {
+    //!    return false
+    //! } else {
+    //!    return true
+    //!     }
+    //! ```
+
     let result = delete(user.filter(id.eq(_id)))
         .execute(con)
         .unwrap_or_else(|err| return 0);
 
     if result == 0 {
-        return false;
+        return false
     } else {
-        return true;
+        return true
     }
 }
 
