@@ -6,8 +6,7 @@ pub mod schema;
 
 use self::models::*;
 use self::schema::user::dsl::*;
-use diesel::sql_types::Integer;
-use diesel::{connection, prelude::*, sql_query};
+use diesel::{prelude::*, sql_query};
 use dotenv::dotenv;
 use std::env;
 
@@ -21,8 +20,10 @@ pub fn establish_connection() -> MysqlConnection {
 }
 
 //find user by id in database
-pub fn is_exist_by_id(_id: i32, connection_to_database: &MysqlConnection) -> Vec<User> {
-    let result = sql_query(format!("SELECT * FROM `user` WHERE `id` = '{}' ", _id))
+pub fn find_by_id(_id: i32, connection_to_database: &MysqlConnection) -> Vec<User> {
+    let result = sql_query(format!(
+        "SELECT * FROM `user` WHERE `id` = '{}' ",
+     _id))
         .load::<User>(connection_to_database)
         .unwrap();
 
@@ -30,7 +31,7 @@ pub fn is_exist_by_id(_id: i32, connection_to_database: &MysqlConnection) -> Vec
 }
 
 //find user by username in database
-pub fn is_exist_by_username(
+pub fn find_by_username(
     _username: String,
     connection_to_database: &MysqlConnection,
 ) -> Vec<User> {
@@ -44,6 +45,16 @@ pub fn is_exist_by_username(
     return result;
 }
 
+pub fn find_all(connection_to_database: &MysqlConnection) -> Vec<User> {
+
+    let result = sql_query("SELECT * FROM `user` ")
+        .load::<User>(connection_to_database)
+        .unwrap();
+
+        return result
+}
+
+
 pub fn register_new_user(
     _username: String,
     _password: String,
@@ -55,7 +66,7 @@ pub fn register_new_user(
     };
 
     //insert user into database
-    let result = diesel::insert_into(user)
+    diesel::insert_into(user)
         .values(&temp_user)
         .execute(connection_to_database)
         .unwrap();
@@ -77,7 +88,10 @@ pub fn hash_password(_password: String) -> String{
 pub fn main() {
     let connection_db = establish_connection();
 
-    let user_exist = is_exist_by_id(1, &connection_db);
+
+
+    let insert_user = register_new_user("Rian".to_string(), "password".to_string(), &connection_db);
+    let user_exist = find_all(&connection_db);
 
     println!("{:?}", user_exist)
 }
