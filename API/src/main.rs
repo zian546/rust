@@ -1,28 +1,35 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use server_config::Config;
+use database::models::User;
+use color_eyre::Result;
+
+mod server_config;
+
+
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
-        App::new()
-            .service(get_hello_service)
-            .route("/hello", web::get().to(get_hello))
-    })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
+async fn main() -> Result<()> {
+    let config = Config::from_env().expect("loading server configurations"); 
+
+    HttpServer::new(move ||
+         App::new()
+        .service(get_user)
+        .route("/", web::get().to(home)))
+        .bind(format!("{}:{}", config.host, config.port))?
+        .run()
+        .await?;
+        Ok(())
 }
 
-async fn get_hello() -> impl Responder {
-    HttpResponse::Ok().body(String::from("Hello, world!"))
+async fn home() -> impl Responder {
+    HttpResponse::Ok().body(String::from("Home Page"))
 }
 
-#[get("/hello_service")]
-async fn get_hello_service() -> impl Responder {
-    HttpResponse::Ok().body(String::from("Hello, world! From service"))
-}
+#[get("/user")]
+async fn get_user() -> impl Responder { 
+    
+    let connection = database::establish_connection();
+let another_user = database::find_all("user".to_string(),&connection);
 
-#[post("/signup")]
-async fn signup() -> impl Responder {
-    //just a placeholder so the build process doesn not complain 
-    HttpResponse::Ok().body(String::from("Sign up"))
+    HttpResponse::Ok().json(another_user)
 }
