@@ -19,3 +19,4 @@ tracing-log= {version ="0.1", features =["env_logger"] }
 tracing-subscriber = "0.2"
 database = {path = "../database"}
 serde = {version = "^1", features =["derive"]}
+diesel = { version = "1.4.4", features = ["mysql", "r2d2"] }

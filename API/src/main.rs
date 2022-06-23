@@ -3,6 +3,7 @@ use color_eyre::Result;
 use database::models::User;
 use server_config::Config;
 use tracing::info;
+use database;
 
 mod server_config;
 
@@ -17,6 +18,7 @@ async fn main() -> Result<()> {
         App::new()
             .wrap(Logger::default())
             .service(get_user)
+            .service(create_user)
             .route("/", web::get().to(home))
     })
     .bind(format!("{}:{}", config.host, config.port))?
@@ -26,14 +28,25 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-async fn home() -> impl Responder {
-    HttpResponse::Ok().body(String::from("Home Page"))
+async fn home() -> impl Responder{
+    HttpResponse::Ok().body("Home page".to_string())
 }
 
 #[get("/user")]
-async fn get_user() -> impl Responder {
-    let connection = database::establish_connection();
-    let another_user = database::find_all("user".to_string(), &connection);
+async fn get_user() -> impl Responder{
+    let db_connection = database::establish_connection();
 
-    HttpResponse::Ok().json(another_user)
+    let result = database::find_all("`user`".to_string(),&db_connection,"".to_string());
+
+    HttpResponse::Ok().json(result)
+}
+
+#[post("/create_user")]
+async fn create_user(new_user: web::Json<database::models::NewUser>) -> impl Responder{
+    let username = new_user.username.clone();
+    let password = new_user.password.clone();
+    let db_connection = database::establish_connection();
+    let result = database::register_new_user( username, password, &db_connection);
+
+    HttpResponse::Ok()//.body(result.to_string())
 }

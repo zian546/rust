@@ -131,7 +131,7 @@ pub fn find_by_username(_username: String, connection_to_database: &MysqlConnect
 ///this function return a vector type ```Vec<User>``` and will return all the user that are currently saved in the database.
 ///
 pub fn find_all(
-    field_name: String,
+
     table_name: String,
     connection_to_database: &MysqlConnection,
     optional_query_statement: String,
@@ -142,22 +142,19 @@ pub fn find_all(
     //! ```#Code:```
     //! ```
     //!
-    //! let result = sql_query(format!("SELECT {}{} FROM `{}`",field_name, optional_query_statement,table_name))
+    //! let result = sql_query(format!("SELECT * {} FROM `{}`", optional_query_statement,table_name))
     //!     .load::<User>(connection_to_database_)
     //!     .unwrap();
     //!
     //! return result;
     //! ```
-    //! the ```check_opt``` function job is to check if there is any optional argument that have been passed in, 
-    //! it will either return the optional argument passed in as a ```String``` or and empty ```String```.
-    //! 
     //! note: make sure to correctly escape the field and table name such as ```"`table_name`"```.
 
     
 
     let result = sql_query(format!(
-        "SELECT {} {} FROM {} ",
-        field_name, optional_query_statement, table_name
+        "SELECT * {} FROM {} ",
+         optional_query_statement, table_name
     ))
     .load::<User>(connection_to_database)
     .unwrap();
@@ -172,7 +169,7 @@ pub fn register_new_user(
     _password: String,
 
     connection_to_database: &MysqlConnection,
-) -> bool {
+) {
     //! this is the struct that we're gonna use to save user to the database.
     //! ```
     //! let temp_user = NewUser{
@@ -198,20 +195,15 @@ pub fn register_new_user(
     //! we run this function.
 
     let temp_user = NewUser {
-        username: &_username,
-        password: &_password,
+        username: _username,
+        password: _password,
     };
 
     let result = insert_into(user)
         .values(&temp_user)
         .execute(connection_to_database)
-        .unwrap_or_else(|err| return 0);
-
-    if result == 0 {
-        return false;
-    } else {
-        return true;
-    }
+        .unwrap();
+ 
 }
 
 ///update user that existed in database using id as a parameter.
@@ -250,7 +242,7 @@ pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
     //! The ```.eq()``` method is used to tell what value we want to change into. *_BUT_* the ```set``` keyword
     //! doesn't _actually execute_ the statement. The statement will be executed when we call the ```.execute()``` method as seen later below.
     //! ```
-    //! .set(field_name.eq(field_value))
+    //! .set(eq(field_value))
     //! ```
     //! Now this is where the statement will be executed. it will be immediately executed when we call the ```execute()``` method.
     //! we pass in an ```MysqlConnection``` instance which is the connection that we actually wiill be using to interact with the database, in this case updating a field in the database.

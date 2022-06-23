@@ -3,7 +3,7 @@
 use crate::schema::user;
 use diesel::Insertable;
 use diesel::QueryableByName;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 /// This is the struct used to get data from the database
 /// ```
@@ -28,13 +28,13 @@ pub struct User {
 /// while this is the struct that we will be using to insert NEW user in the database
 /// ```
 /// pub struct NewUser  <'a>   {
-///pub username: &'a str,
-///pub password: &'a str,
+/// pub username: String,
+/// pub password: String,
 ///}
 /// ```
-#[derive(Insertable)]
+#[derive(Insertable, Deserialize, Serialize)]
 #[table_name = "user"]
-pub struct NewUser  <'a>   {
-    pub username: &'a str,
-    pub password: &'a str,
+pub struct NewUser     {
+    pub username: String,
+    pub password: String,
 }
