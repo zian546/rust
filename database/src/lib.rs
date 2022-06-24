@@ -169,12 +169,12 @@ pub fn register_new_user(
     _password: String,
 
     connection_to_database: &MysqlConnection,
-) {
+) ->  Result<usize, diesel::result::Error> {
     //! this is the struct that we're gonna use to save user to the database.
     //! ```
     //! let temp_user = NewUser{
-    //! username: &_username,
-    //! password: &_password
+    //! username: _username,
+    //! password: _password
     //! };
     //! ```
     //! pay attention to the struct, it is the same model that we
@@ -186,13 +186,14 @@ pub fn register_new_user(
     //! let result = insert_into(user)
     //!     .values(&temp_user);
     //!     .execute(connection_to_database)
-    //!     .unwrap_or_else(|err| return 0);
+    //!     
+    //! return result
     //! ```
     //! notice that in the ```insert_into``` statement, we specify the table name. this possible because we are using the
     //! schema that provide us what table we have in the database.
-    //! also note that we use the ```.unwrap_or_else``` method.
-    //! this is because we want to avoid the thread stopping completely when something goes wrong at the time
-    //! we run this function.
+    //! 
+    //! this function return a result type ```Result<usize, diesel::result::Error>```
+ 
 
     let temp_user = NewUser {
         username: _username,
@@ -201,30 +202,26 @@ pub fn register_new_user(
 
     let result = insert_into(user)
         .values(&temp_user)
-        .execute(connection_to_database)
-        .unwrap();
+        .execute(connection_to_database);
+
+        return result;
+        
  
 }
 
 ///update user that existed in database using id as a parameter.
 ///
-pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
+pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> Result<usize,diesel::result::Error> {
     //!this function will update the user based on the id of the user given when we call this function.
     //! this function works using the diesel ORM auto-generated SQL statement
     //!
     //! ```#Code:```
+    //! 
     //! ```
-    //!let result = update(user)
+    //! let result = update(user)
     //!     .filter(id.eq(_id))
     //!     .set(value.eq(_value))
     //!     .execute(con)
-    //!     .unwrap_or_else(|err| return 0);
-    //!
-    //!if result == 0 {
-    //!     return false;
-    //!} else {
-    //!     return true;
-    //!}
     //! ```
     //!
     //! the update keyword here is actually a neat way to create a ```UPDATE``` query statement
@@ -249,78 +246,23 @@ pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool {
     //! ```
     //! .execute(database_connection)
     //! ```
-    //! next the ```.unwrap_or_else()``` works by _literally unwrapping_ the ```Result``` enum  and returning a ```usize``` of ```1```
-    //! if the SQL statement was successfully executed, and we add the ```|err| return 0;``` closure to return ```0``` when the SQL statement
-    //! fails to execute.
-    //! ```
-    //! .unwrap_or_else(|err| return 0);
-    //! ```
-    //! and then we have a simple ```if else``` block of code that will evaluate the return value of the the SQL statement execution.
-    //! this return a ```boolean``` value depending on the ```usize``` that have been returned by the SQL statement execution.
-    //! ```
-    //! if result == 0{
-    //!     return false;
-    //! } else {
-    //!     return true;
-    //!     }
-    //! ```
-    //! why a ```boolean``` value? if you take a closer look at the return type of the ```update_user_by_id``` function, you will notice
-    //! that the function have a return type of ```bool```.
-    //! ```
-    //! pub fn update_user_by_id(_id: i32, _value: i32, con: &MysqlConnection) -> bool //<- we return a boolean value here
-    //! ```
+    //!   
+    //! this function return a result type ```Result<usize, diesel::result::Error>``` 
+    //! 
+
 
     let result = update(user)
         .filter(id.eq(_id))
         .set(value.eq(_value))
-        .execute(con)
-        .unwrap_or_else(|err| return 0);
-
-    if result == 0 {
-        return false;
-    } else {
-        return true;
-    }
+        .execute(con);
+  
+        return result
 }
 
-///update user that existed in database using username as a parameter.
-///
-pub fn update_user_by_username(_username: String, _value: i32, con: &MysqlConnection) -> bool {
-    //!this function will update the user based on the ```_username``` that is the actual username of the user pass in when we call this function.
-    //! this function works because it uses the diesel ORM auto-generated SQL statement
-    //!
-    //! ```#Code:```
-    //! ```
-    //!let result = update(user)
-    //!     .filter(username.eq(_username))
-    //!     .set(value.eq(_value))
-    //!     .execute(con)
-    //!     .unwrap_or_else(|err| return 0);
-    //!
-    //!if result == 0 {
-    //!     return false;
-    //!} else {
-    //!     return true;
-    //!}
-    //! ```
-    //! this function works very similarly to the ```update_user_by_id``` function. see [here](fn.update_user_by_id.html) for more details
-
-    let result = update(user)
-        .filter(username.eq(_username))
-        .set(value.eq(_value))
-        .execute(con)
-        .unwrap_or_else(|err| return 0);
-
-    if result == 0 {
-        return false;
-    } else {
-        return true;
-    }
-}
 
 /// this function delete ```1```  user in database using user id as a parameter.
 ///
-pub fn delete_user_by_id(_id: i32, con: &MysqlConnection) -> bool {
+pub fn delete_user_by_id(_id: i32, con: &MysqlConnection) -> Result<usize,diesel::result::Error> {
     //! this function will delete 1 user from the database using user id as a parameter and return a boolean value true if the query succeded or false otherwise.
     //! this function is also works by using the auto generated SQL query statement method provided by diesel.
     //!
@@ -346,54 +288,12 @@ pub fn delete_user_by_id(_id: i32, con: &MysqlConnection) -> bool {
     //! ```
     //! .execute(database_connection)
     //! ```
-    //! and then we have a simple ```if else``` block to evaluate the return value of the ```DELETE```  SQL statement execution.
-    //! ```
-    //! if result == 0 {
-    //!    return false
-    //! } else {
-    //!    return true
-    //!     }
-    //! ```
+    //! this function return a result type ```Result<usize, diesel::result::Error>```
 
     let result = delete(user.filter(id.eq(_id)))
-        .execute(con)
-        .unwrap_or_else(|err| return 0);
+        .execute(con);
 
-    if result == 0 {
-        return false;
-    } else {
-        return true;
-    }
+    return result
+
 }
 
-/// this function will delete a user from the database using the user's username as parameter
-///
-pub fn delete_user_by_username(_username: String, con: &MysqlConnection) -> bool {
-    //! this function will delete 1 user from the database using user's   as a parameter and return a boolean value true if the query succeded or false otherwise.
-    //! this function is also works by using the auto generated SQL query statement method provided by diesel.
-    //!
-    //! ```#Code:```
-    //! ```
-    //! let result = delete(user.filter(id.eq(_id)))
-    //!     .execute(con)
-    //!     .unwrap_or_else(|err| return 0);
-    //!
-    //! if result == 0 {
-    //!     return false
-    //! } else {
-    //!     return true
-    //! }
-    //! ```
-    //! this function works very similarly to ```delete_user_by_id``` function (see [here](fn.delete_user_by_id.html)). except that in this function, rather than taking the user's id as argument,
-    //! it takes the user's username and attempt to delete the entitiy that have the same username given as the argument.
-
-    let result = delete(user.filter(username.eq(_username)))
-        .execute(con)
-        .unwrap_or_else(|err| return 0);
-
-    if result == 0 {
-        return false;
-    } else {
-        return true;
-    }
-}

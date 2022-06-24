@@ -1,6 +1,5 @@
-use actix_web::{get, middleware::Logger, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, middleware::Logger, post, web, App, HttpResponse, HttpServer, Responder, put, delete};
 use color_eyre::Result;
-use database::models::User;
 use server_config::Config;
 use tracing::info;
 use database;
@@ -19,6 +18,8 @@ async fn main() -> Result<()> {
             .wrap(Logger::default())
             .service(get_user)
             .service(create_user)
+            .service(update_value)
+            .service(delete_user)
             .route("/", web::get().to(home))
     })
     .bind(format!("{}:{}", config.host, config.port))?
@@ -47,6 +48,43 @@ async fn create_user(new_user: web::Json<database::models::NewUser>) -> impl Res
     let password = new_user.password.clone();
     let db_connection = database::establish_connection();
     let result = database::register_new_user( username, password, &db_connection);
+    
+    match result {
+        Ok(value) =>  return HttpResponse::Created().json(format!("user created successfully, Status Code: {}",value).to_string()),
+        Err(e) => return HttpResponse::BadRequest().json(e.to_string())
+    };
 
-    HttpResponse::Ok()//.body(result.to_string())
+    
+
 }
+
+#[put("/update_value_id")]
+async fn update_value(new_value: web::Json<database::models::UpdateValueIdModel>) -> impl Responder{
+    let value = new_value.value;
+    let id = new_value.id;
+    let db_connection = database::establish_connection();
+    
+    let result = database::update_user_by_id(id, value, &db_connection);
+
+    match result {
+        Ok(value) =>  return HttpResponse::Ok().json(format!("Status Code: {}",value).to_string()),
+        Err(e) => return HttpResponse::BadRequest().json(e.to_string())
+    };
+}
+
+#[delete("/delete_user/{id}")]
+async fn delete_user(id : web::Path<i32>)-> impl Responder{
+    let user_id = *id;
+    let db_connection = database::establish_connection();
+
+    let result = database::delete_user_by_id(user_id, &db_connection);
+    match result {
+        Ok(value) =>  return HttpResponse::Ok().json(format!("Status Code: {}",value).to_string()),
+        Err(e) => return HttpResponse::NotFound().json(e.to_string())
+    };
+
+}
+
+
+
+//todo : make the database connection pooled.

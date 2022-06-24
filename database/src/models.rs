@@ -1,7 +1,7 @@
 ///this is the model that will be used to interact with the database
 
 use crate::schema::user;
-use diesel::Insertable;
+use diesel::{Insertable, Identifiable};
 use diesel::QueryableByName;
 use serde::{Serialize, Deserialize};
 
@@ -38,3 +38,11 @@ pub struct NewUser     {
     pub username: String,
     pub password: String,
 }
+
+#[derive(Identifiable, Deserialize)]
+#[table_name = "user"]
+pub struct UpdateValueIdModel{
+    pub id : i32,
+    pub value : i32
+}
+
