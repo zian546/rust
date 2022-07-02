@@ -1,7 +1,7 @@
 # Rust simple web server template
 This is a repo that aims to make developing web server a little bit easier. It has all the basic starting boiler plate code
 and some example to get you started writing API's right away and not worry about the hassle of writing the boiler plate code
-required to run the webserver. 
+required to run the web server. 
 
 ## What to expect
 This template only provide the basics of the basic web server boiler plate code. by that i mean  *__no security__* whatsoever(except __cors__).
@@ -52,6 +52,10 @@ let db_connection = database::establish_connection();
 <li>future task:</li><br/>
 
 - [ ] pool database connection
+
+## Contact:
+- Email: <mynameiszian@gmail.com>:email:
+
   
 
 
