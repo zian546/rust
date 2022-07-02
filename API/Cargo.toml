@@ -20,3 +20,4 @@ tracing-subscriber = "0.2"
 database = {path = "../database"}
 serde = {version = "^1", features =["derive"]}
 diesel = { version = "1.4.4", features = ["mysql", "r2d2"] }
+actix-cors = "0.6.1" 

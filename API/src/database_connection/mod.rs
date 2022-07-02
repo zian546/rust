@@ -5,10 +5,11 @@ use r2d2::{self, PooledConnection};
 use std::sync::Arc;
 
 
-
+// work in progress, don't use this.
+/// work in progress, don't use this.
 pub fn get_connection() -> PooledConnection<MysqlConnectionManager>{
     let config = Config::from_env().expect("loading server configurations");
-    let opts = Opts::from_url(&config.db_url).unwrap();
+    let opts = Opts::from_url(&config.database_url).unwrap();
     let builder = OptsBuilder::from_opts(opts);
     let manager = MysqlConnectionManager::new(builder);
     let pool = Arc::new(r2d2::Pool::builder().max_size(10).build(manager).unwrap());

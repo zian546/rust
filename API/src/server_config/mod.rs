@@ -8,7 +8,8 @@ use eyre::WrapErr;
 #[derive(Debug, Deserialize)]
 pub struct Config{
     pub host : String,
-    pub port : i32
+    pub port : i32,
+    pub database_url: String,
 }
 
 impl Config {
