@@ -30,7 +30,7 @@ to load your ```.env``` variable to your source code.
 
 ---
 ### Example:
-this will load the *__.env variable__* to your soruce code.
+this will load the *__.env variable__* to your source code.
 ```rust
 let config = Config::from_env().expect("loading server configurations");
 ```
