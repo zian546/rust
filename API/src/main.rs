@@ -5,6 +5,7 @@ use color_eyre::Result;
 use database;
 use server_config::Config;
 use tracing::info;
+use actix_cors::Cors;
 
 mod server_config;
 
@@ -18,8 +19,8 @@ async fn main() -> Result<()> {
         "starting server at  host : {}, port : {}",
         config.host, config.port
     );
-    let cors = Cors::default().allow_any_origin().allow_any_method();
     HttpServer::new(move || {
+        let cors = Cors::default().allow_any_origin().allow_any_method();
         App::new()
             .wrap(cors)
             .wrap(Logger::default())
