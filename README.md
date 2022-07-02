@@ -39,7 +39,7 @@ then you can just acces the variable like this
 let port = config.port // this will load the value that have been assigned to the PORT variable in the .env file
 ```
 ---
-
+### Notes:
 Right now this template only support making new connection to the database every *request*. this is terrible and i'm planning
 to improve this later(PR is welcomed). don't use the [database_connecion](https://github.com/zian546/web-server-rust-backbone/blob/main/API/src/database_connection/mod.rs) module because it's still work in progress.
 use the [establish_connection](https://github.com/zian546/web-server-rust-backbone/blob/main/database/src/lib.rs) method from the database crate instead.
@@ -48,7 +48,7 @@ use the [establish_connection](https://github.com/zian546/web-server-rust-backbo
 let db_connection = database::establish_connection();
 ```
 
-### Misc
+### Misc:
 <li>future task:</li><br/>
 
 - [ ] pool database connection
