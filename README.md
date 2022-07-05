@@ -28,6 +28,8 @@ a compiler error because this template will merge with your ```.env``` file. (se
 you can change and modify the ```Config``` struct based on your needs. you'll just have to call the ```from_env``` function 
 to load your ```.env``` variable to your source code.
 
+ALSO INCLUDE A ```RUST_LOG=info``` IN YOUR .ENV VARIABLE!! OR ELSE IT WOULDN'T DISPLAY ANY TRACING
+
 ---
 ### Example:
 this will load the *__.env variable__* to your source code.
